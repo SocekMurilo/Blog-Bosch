@@ -67,5 +67,10 @@ class ArticleController {
             return res.status(500).send({ error: "Falha ao curtir", data: error.message })
         }
     }
+    static async getAll(req, res) {
+        const articles = await Article.find()
+
+        return res.status(200).send(articles);
+    }
 }
 module.exports = ArticleController;

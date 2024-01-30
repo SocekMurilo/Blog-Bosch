@@ -1,8 +1,15 @@
 const { Author } = require("../model/Author");
 const User = require("../model/Login");
+const CryptoJS = require('crypto-js');
 class AuthorController {
+
+
     static async create(req, res) {
-        const { name, email, birth } = req.body;
+        var bytes = CryptoJS.AES.decrypt(req.body.jsonCrypt, process.env.SECRET);
+        const decryptd = bytes.toString(CryptoJS.enc.Utf8);
+        const json = JSON.parse(decryptd);
+
+        const { name, email, birth } = json;
         if (!name || !birth || !email)
             return res.status(400).send({ message: "os campos não podem estarem vazios " });
         if (name.length < 3)
@@ -34,5 +41,41 @@ class AuthorController {
             throw error;
         }
     }
+    static async login(req, res) {
+        var bytes = CryptoJS.AES.decrypt(req.body.jsonCrypt, process.env.SECRET);
+        const decryptd = bytes.toString(CryptoJS.enc.Utf8);
+        const json = JSON.parse(decryptd);
+
+        const { email, password } = json;
+
+        if (!email)
+            return res.status(422).json({ message: "O e-mail é obrigatório" });
+        if (!password)
+            return res.status(422).json({ message: "A senha é obrigatória" });
+        const user = await User.findOne({ email: email });
+        if (!user)
+            return res.status(422).json({ message: "Usuário e/ou senha inválido" });
+
+        if (!await bcrypt.compare(password, user.password))
+            return res.status(422).send({ message: "Usuário e/ou senha inválido" })
+
+        try {
+            const secret = process.env.SECRET
+            const token = jwt.sign(
+                {
+                    id: user._id,
+                },
+                secret,
+                {
+                    expiresIn: '2 days'
+                }
+
+            );
+            return res.status(200).send({ token: token })
+        } catch (error) {
+            return res.status(500).send({ message: "Something failed", data: error.message })
+        }
+    }
+
 }
 module.exports = AuthorController;

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Button, Card, Container } from "react-bootstrap";
 import { AiOutlineLike } from "react-icons/ai";
 import styles from "./styles.module.scss";
-import axios from  "axios"
+import axios from 'axios';
 
 export default function Post() {
     
@@ -10,7 +10,7 @@ export default function Post() {
 
     async function getPosts(){
         const res = await axios.get('http://localhost:8080/api/article')
-        console.log(res);
+        setArtigos(res.data)
         }
 
     useEffect(() => {
@@ -25,7 +25,7 @@ export default function Post() {
     const RenderPosts = () => {
         return artigos.map((artigo) => {
             return (
-                <Card key={artigo.id} className={styles.card}>
+                <Card key={artigo._id} className={styles.card}>
                     <Card.Title className={styles.card__title}>{artigo.title}</Card.Title>
                     <Card.Body className={styles.card__body}>
                         <Card.Text className={styles.card__body__article}>
