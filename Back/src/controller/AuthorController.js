@@ -42,10 +42,6 @@ class AuthorController {
         }
     }
     static async login(req, res) {
-        var bytes = CryptoJS.AES.decrypt(req.body.jsonCrypt, process.env.SECRET);
-        const decryptd = bytes.toString(CryptoJS.enc.Utf8);
-        const json = JSON.parse(decryptd);
-
         const { email, password } = json;
 
         if (!email)
@@ -56,8 +52,12 @@ class AuthorController {
         if (!user)
             return res.status(422).json({ message: "Usuário e/ou senha inválido" });
 
-        if (!await bcrypt.compare(password, user.password))
-            return res.status(422).send({ message: "Usuário e/ou senha inválido" })
+        var bytes = CryptoJS.AES.decrypt(req.body.jsonCrypt, process.env.SECRET);
+        const decryptd = bytes.toString(CryptoJS.enc.Utf8);
+        const json = JSON.parse(decryptd);
+
+        if (json2 != password)
+            return res.status(422).send({message : "Senha Invalida"});
 
         try {
             const secret = process.env.SECRET
