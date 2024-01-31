@@ -6,16 +6,26 @@ import LoginPage from './pages/LoginPage';
 import { AlertProvider } from './context/alert';
 import RegisterPage from './pages/RegisterPage';
 import AccessDenied from './pages/AccessDenied';
+import NavBar from './components/Header';
+import ProtectedRoute from './pages/ProtectRoute';
+
+
 function App() {
   return (
       <>
         <AlertProvider>
           <Routes>
             <Route path="/" element={<LoginPage/>}/>
-            <Route path="/home" element={<HomePage/>}/>
-            <Route path="/add" element={<AddPostPage/>}/>
             <Route path='/register' element={<RegisterPage />} />
-            <Route path='/acc' element={<AccessDenied />} />
+            <Route path="/home" element={<HomePage/>}/>
+            <Route path="/main" element={
+              <ProtectedRoute
+                errorPage = {<AccessDenied />}
+                targetPage = { <NavBar/> }
+              />
+            }/>
+            <Route path="" element={<AddPostPage/>}/>
+            <Route path='*' element={<AccessDenied />} />
 
           </Routes>
         </AlertProvider>
