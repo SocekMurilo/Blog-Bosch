@@ -124,6 +124,32 @@ class ArticleController {
             return res.status(500).send({ error: "Falha ao curtir", data: error.message })
         }
     }
+
+    static async replyArticle(req, res) {
+        const { text, authorid } = req.body;
+        
+        if ( !text || !authorid)
+        return res.status(400).send({ message: "os campos não podem estarem vazios " });
+
+        if (authorid.length < 3)
+            return res.status(400).send({ message: "O autor não pode ser menor que 3 caracteres" })
+        try {
+            const author = await authorController.getAuthor(authorid);
+            const article = {
+                text,
+                likes: 0,
+                author,
+                createdAt: Date.now(),
+                updatedAt: Date.now(),
+                removedAt: null,
+            }
+            await Article.create(article)
+            return res.status(201).send({ message: "Resposta criada com sucesso" })
+        } catch (error) {
+            ArticleController.createLog(error);
+            return res.status(500).send({ error: "Falha ao salvar a Resposta", data: error.message });
+        }
+    }
 }
 
 module.exports = ArticleController;
